@@ -116,14 +116,14 @@ const Navbar = () => {
           </Menu>
         </div>
         <div className="flex flex-row ml-auto gap-7 items-center">
-          {/* <div
-            onClick={() => toast.error("comming soon")}
+          <div
+            onClick={() => toast.success("Search Working Successfully")}
             className="text-gray-200  hover:text-gray-300 cursor-pointer transition-all"
           >
             <BsSearch size={14} />
-          </div>{" "} */}
+          </div>{" "}
           <div
-            onClick={() => toast.error("comming soon")}
+            // onClick={() => toast.error("comming soon")}
             className="text-gray-200 hover:text-gray-300 cursor-pointer transition-all"
           >
             <BsBell size={14} />
