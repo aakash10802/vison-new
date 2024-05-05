@@ -84,7 +84,7 @@ const SeriesCard = ({
               </div>
             </div>
             <p className="text-green-400 font-semibold mt-4">
-              {title} <span className="text-white">{genre.slice(0,14)+ " ..."}</span>
+              {title.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())} <span className="text-white">(genre.slice(0, 14) + " ...").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())</span>
             </p>
             <div className="flex flex-row mt-4 gap-2 items-center">
               <p className="text-white text-[14px] lg:text-sm flex items-center gap-1">
