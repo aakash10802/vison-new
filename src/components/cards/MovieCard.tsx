@@ -73,7 +73,7 @@ const MovieCard = ({
               </div>
             </div>
             <p className="text-green-400 font-semibold mt-4">
-              {title.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())} <span className="text-white">{genre.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</span>
+              {title.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())} <span className="text-white">Genre:{genre.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</span>
             </p>
 
             <div className="flex flex-row mt-4 gap-2 items-center">
