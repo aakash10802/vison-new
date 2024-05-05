@@ -184,7 +184,7 @@ const Navbar = () => {
                 onClick={() => signOut()}
                 className="px-3 text-center text-white text-sm hover:underline  flex items-center justify-between gap-3"
               >
-                Sign out of Netflix
+                Sign out of Vision.io
                 <IoLogOut size={25} className="text-red-600" />
               </div>
             </Menu>
