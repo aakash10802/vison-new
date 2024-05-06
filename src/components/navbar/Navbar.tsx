@@ -196,7 +196,7 @@ const Navbar = () => {
           </div>
           <div
             onClick={() =>
-              toast.error("There is no notification from the Admin")
+              toast.error("There is no notification ")
             }
             className="text-gray-200 hover:text-gray-300 cursor-pointer transition-all"
           >
