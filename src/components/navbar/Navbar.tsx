@@ -15,6 +15,8 @@ import { BsBell, BsChevronDown, BsSearch } from "react-icons/bs";
 import { useProfileModal } from "@/hooks/useProfileModal";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
+import useMovies from "@/hooks/useMovies";
+import useSeries from "@/hooks/useSeries"; // New import
 import { BiNotification } from "react-icons/bi";
 
 const TOP_OFFSET = 66;
@@ -32,10 +34,14 @@ const Navbar = () => {
 
   const { user } = useCurrentUser();
   const profileModal = useProfileModal();
+  const { movies } = useMovies();
+  const { series } = useSeries(); // New series data
 
   const [showBg, setShowBg] = useState(false);
   const [displayNavbarMenu, setDisplayNavbarMenu] = useState(false);
   const [displayAccountMenu, setDisplayAccountMenu] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState<string | null>(null);
 
   const toggleNavbartMenu = useCallback(() => {
     setDisplayNavbarMenu((prev) => !prev);
@@ -48,7 +54,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY >= TOP_OFFSET) {
-        return setShowBg(true);
+        setShowBg(true);
       } else {
         setShowBg(false);
       }
@@ -61,11 +67,27 @@ const Navbar = () => {
     };
   }, []);
 
+  // Function to handle search value change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+
+  // Function to handle tapping on search result
+  const handleSearchResultClick = (type: string, id: number) => {
+    if (type === "movie") {
+      router.push(`/movies/${id}`);
+    } else if (type === "series") {
+      router.push(`/series/${id}`);
+    }
+    setSearchOpen(false);
+    setSearchValue("");
+  };
+
   return (
-    <nav className="w-full fixed z-40 ">
+    <nav className="w-full fixed z-40">
       <div
         className={twMerge(
-          "px-4 md:px-16 flex items-center transition py-6 flex-row duration-500 ",
+          "px-4 md:px-16 flex items-center transition py-6 flex-row duration-500",
           showBg ? "bg-opacity-90 bg-zinc-900" : "bg-transparent"
         )}
       >
@@ -73,16 +95,14 @@ const Navbar = () => {
           <Image src={logo.src} alt="logo" fill />
         </div>
         <div className="flex-row ml-8 gap-7 hidden lg:flex">
-          {navLinks.map((link) => {
-            return (
-              <NavbarItem
-                key={link.href}
-                href={link.href}
-                label={link.label}
-                onClick={() => router.push(link.href)}
-              />
-            );
-          })}
+          {navLinks.map((link) => (
+            <NavbarItem
+              key={link.href}
+              href={link.href}
+              label={link.label}
+              onClick={() => router.push(link.href)}
+            />
+          ))}
         </div>
         <div
           onClick={toggleNavbartMenu}
@@ -101,29 +121,83 @@ const Navbar = () => {
             setClose={() => setDisplayNavbarMenu(false)}
           >
             <div className="flex flex-col gap-4 items-center justify-center">
-              {navLinks.map((link) => {
-                return (
-                  <NavbarItem
-                    key={link.href}
-                    href={link.href}
-                    label={link.label}
-                    className="capitalize w-fit px-3 text-center text-white   "
-                    onClick={() => router.push(link.href)}
-                  />
-                );
-              })}
+              {navLinks.map((link) => (
+                <NavbarItem
+                  key={link.href}
+                  href={link.href}
+                  label={link.label}
+                  className="capitalize w-fit px-3 text-center text-white"
+                  onClick={() => router.push(link.href)}
+                />
+              ))}
             </div>
           </Menu>
         </div>
-        <div className="flex flex-row ml-auto gap-7 items-center">
+        <div className="flex flex-row ml-auto gap-7 items-center relative">
+          <div className="text-gray-200 relative hover:text-gray-300 transition-all">
+            <BsSearch
+              size={14}
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="cursor-pointer"
+            />
+            <div className={`absolute top-full right-0 w-[350px] bg-white rounded-lg shadow-lg ${searchOpen ? "block" : "hidden"}`}>
+              <input
+                onChange={handleSearchChange}
+                value={searchValue || ""}
+                placeholder="Search..."
+                className="w-full text-black border border-black rounded-lg p-2"
+              />
+              <div className="max-h-64 overflow-y-auto">
+                {searchValue && (
+                  <>
+                    {/* Display movie results */}
+                    <div className="font-semibold text-red-500 p-2">Movies</div>
+                    {movies && movies.length > 0 ? (
+                      movies
+                        .filter((movie) =>
+                          movie.title.toLowerCase().includes(searchValue.toLowerCase())
+                        )
+                        .map((movie) => (
+                          <div
+                            key={movie.id}
+                            className="text-gray-600 p-2 cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleSearchResultClick("movie", movie.id)}
+                          >
+                            {movie.title}
+                          </div>
+                        ))
+                    ) : (
+                      <div className="text-gray-400 p-2">No movies found</div>
+                    )}
+
+                    {/* Display series results */}
+                    <div className="font-semibold text-red-500 p-2">Series</div>
+                    {series && series.length > 0 ? (
+                      series
+                        .filter((serie) =>
+                          serie.title.toLowerCase().includes(searchValue.toLowerCase())
+                        )
+                        .map((serie) => (
+                          <div
+                            key={serie.id}
+                            className="text-gray-600 p-2 cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleSearchResultClick("series", serie.id)}
+                          >
+                            {serie.title}
+                          </div>
+                        ))
+                    ) : (
+                      <div className="text-gray-400 p-2">No series found</div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
           <div
-            onClick={() => toast.success("Search Working Successfully")}
-            className="text-gray-200  hover:text-gray-300 cursor-pointer transition-all"
-          >
-            <BsSearch size={14} />
-          </div>{" "}
-          <div
-            // onClick={() => toast.error("comming soon")}
+            onClick={() =>
+              toast.error("There is no notification from the Admin")
+            }
             className="text-gray-200 hover:text-gray-300 cursor-pointer transition-all"
           >
             <BsBell size={14} />
@@ -132,9 +206,9 @@ const Navbar = () => {
             onClick={toggleAccountMenu}
             className="flex flex-row items-center gap-2 cursor-pointer relative"
           >
-            <div className="min-w-10 min-h-10 max-w-10 max-h-10 lg:w-10 lg:h-10 rounded-md overflow-hidden ">
+            <div className="min-w-10 min-h-10 max-w-10 max-h-10 lg:w-10 lg:h-10 rounded-md overflow-hidden">
               <Image
-                className="object-contain  max-w-fit rounded-md"
+                className="object-contain max-w-fit rounded-md"
                 src={user?.image || blue.src}
                 alt=""
                 fill
@@ -175,14 +249,14 @@ const Navbar = () => {
                     onClick={() => router.push(`/admin`)}
                     className="flex gap-y-3 capitalize items-center justify-start text-white px-3 hover:underline"
                   >
-                    admin Dashboard
+                    Admin Dashboard
                   </div>
                   <hr className="bg-gray-600 border-0 h-px my-4" />
                 </>
               )}
               <div
                 onClick={() => signOut()}
-                className="px-3 text-center text-white text-sm hover:underline  flex items-center justify-between gap-3"
+                className="px-3 text-center text-white text-sm hover:underline flex items-center justify-between gap-3"
               >
                 Sign out of Vision.io
                 <IoLogOut size={25} className="text-red-600" />
